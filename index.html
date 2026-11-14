@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Free demo of One Small Reset, an ADHD-friendly cleaning planner that gives you one small task at a time.">
+<title>One Small Reset Demo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
+<style>
+/* Layout: one calm column, a single decision at a time; bottom tab bar like a phone app. */
+:root{
+  --bg:#F4F0E8; --surface:#FFFDF9; --surface-2:#F8F4EC; --ink:#22302B; --muted:#55645E; --line:#E7E0D2;
+  --accent:#237565; --accent-ink:#FFFFFF; --accent-soft:#D9EFE9; --warm:#F4C9A8; --warm-ink:#5A3418;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif; --body:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:20px;
+}
+:root[data-pal="lilac"]{--accent:#5D4BBD;--accent-soft:#E6E1FA}
+:root[data-pal="peach"]{--accent:#AD4C28;--accent-soft:#FBE4D8}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#141A18;--surface:#1D2623;--surface-2:#232E2A;--ink:#EAF1EE;--muted:#9FB0AA;--line:#2F3B37;--accent:#5CC4AE;--accent-ink:#0E1A17;--accent-soft:#1F3A34;--warm:#6A4630;--warm-ink:#FBE4D8;color-scheme:dark}
+  :root:not([data-theme="light"])[data-pal="lilac"]{--accent:#A99BF0;--accent-soft:#2B2650}
+  :root:not([data-theme="light"])[data-pal="peach"]{--accent:#F09B78;--accent-soft:#48291C}}
+:root[data-theme="dark"]{--bg:#141A18;--surface:#1D2623;--surface-2:#232E2A;--ink:#EAF1EE;--muted:#9FB0AA;--line:#2F3B37;--accent:#5CC4AE;--accent-ink:#0E1A17;--accent-soft:#1F3A34;--warm:#6A4630;--warm-ink:#FBE4D8;color-scheme:dark}
+:root[data-theme="dark"][data-pal="lilac"]{--accent:#A99BF0;--accent-soft:#2B2650}
+:root[data-theme="dark"][data-pal="peach"]{--accent:#F09B78;--accent-soft:#48291C}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 110px}
+.app{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+#view{display:flex;flex-direction:column;gap:18px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{font-family:var(--display);font-weight:700;font-size:clamp(16px,4.8vw,21px);letter-spacing:-.01em;white-space:nowrap}
+.brand span{color:var(--accent)}
+.dots{display:flex;gap:6px;align-items:center;flex:none}
+.dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--surface);outline:2px solid transparent;cursor:pointer;padding:0}
+.dot[aria-pressed="true"]{outline-color:var(--ink)}
+.gear{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:18px;cursor:pointer;padding:0;margin-left:4px}
+.gear[aria-current="page"]{background:var(--accent-soft);border-color:var(--accent)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(26px,6.5vw,34px);line-height:1.08;letter-spacing:-.02em;margin:6px 0 4px;text-wrap:balance}
+h2{font-family:var(--display);font-weight:700;font-size:20px;margin:0;text-wrap:balance}
+p{margin:0}.muted{color:var(--muted)}.fine{font-size:13px;color:var(--muted);text-align:center}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(60,45,20,.04),0 8px 24px -16px rgba(60,45,20,.18)}
+.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}.hero svg{flex:none;width:76px;height:76px;color:var(--accent)}
+.ico{flex:none;width:38px;height:38px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}.ico svg{width:22px;height:22px}
+.rh{display:flex;align-items:center;gap:10px;min-width:0}.rh h2{overflow-wrap:anywhere}
+.card.focus{border:2px solid var(--accent)}
+.card.note{background:var(--accent-soft);border-color:transparent}
+.card.lock{border-style:dashed;align-items:flex-start}
+.label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chips.four{display:grid;grid-template-columns:1fr 1fr}.col2{display:flex;flex-direction:column;gap:10px}
+.chip{flex:1 1 70px;min-height:48px;border-radius:14px;border:2px solid var(--line);background:var(--surface-2);color:var(--ink);font:500 15px var(--body);cursor:pointer;padding:6px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.chip b{font-family:var(--display);font-size:15px}
+.chip small{color:var(--muted);font-size:11px}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.btn{min-height:54px;border-radius:16px;border:0;background:var(--accent);color:var(--accent-ink);font:700 17px var(--body);cursor:pointer;padding:0 20px}
+.btn.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.btn.small{min-height:42px;font-size:14px;border-radius:12px;padding:0 14px}
+.btn.text{background:transparent;color:var(--muted);min-height:40px;font-size:14px;text-decoration:underline;padding:0 6px;border:0}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>.btn{flex:1 1 130px}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.big{font-family:var(--display);font-weight:700;font-size:clamp(24px,6vw,30px);line-height:1.12;text-wrap:balance;overflow-wrap:anywhere}
+.steps{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
+.steps li::marker{color:var(--accent);font-weight:700}
+.task{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:12px}
+.task{flex-wrap:wrap}select.mins{flex:none;width:64px;min-height:42px}.task .t{flex:1;min-width:110px}.task .t b{display:block;font-weight:700;overflow-wrap:anywhere}
+.task .meta{font-size:13px;color:var(--muted)}
+.task.done .t b{color:var(--muted)}.task.done .t b{text-decoration:line-through}
+.check{width:34px;height:34px;flex:none;border-radius:50%;border:2px solid var(--accent);background:transparent;color:var(--accent-ink);cursor:pointer;font-size:18px;line-height:1;padding:0}
+.check[aria-pressed="true"],.check.on{background:var(--accent);display:grid;place-items:center}
+.pill{display:inline-block;background:var(--warm);color:var(--warm-ink);font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px}
+.wins{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.win{background:var(--accent-soft);border-radius:16px;padding:12px 6px;text-align:center}
+.win b{display:block;font-family:var(--display);font-size:28px;font-variant-numeric:tabular-nums;color:var(--accent)}
+.win span{font-size:12px;color:var(--muted)}
+.roomhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+form.stack{display:flex;flex-direction:column;gap:8px}
+.add{display:flex;gap:8px}
+input[type=text],select,textarea{flex:1;min-width:0;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:400 15px var(--body);padding:0 12px}
+textarea{width:100%;min-height:84px;padding:10px 12px;resize:vertical}
+textarea.code{font:400 12px ui-monospace,Menlo,Consolas,monospace;min-height:110px}
+details summary{cursor:pointer;color:var(--muted);font-size:14px;min-height:36px;display:flex;align-items:center}
+details .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 8px}
+details label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.switch{min-width:64px;min-height:36px;border-radius:99px;border:2px solid var(--line);background:var(--surface-2);color:var(--muted);font:700 13px var(--body);cursor:pointer;flex:none}
+.switch[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:8px max(16px,env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right,0px));z-index:5}
+nav div{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+nav button{min-height:52px;border:0;border-radius:14px;background:transparent;color:var(--muted);font:700 13px var(--body);cursor:pointer}
+nav button[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
+.timer{position:fixed;inset:0;background:var(--bg);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;overflow:auto}
+.ring{width:min(60vw,240px);aspect-ratio:1;position:relative;max-width:100%;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:14}.ring .bg{stroke:var(--line)}.ring .fg{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset .9s linear}
+.ring .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;font-size:clamp(40px,13vw,58px);font-variant-numeric:tabular-nums}
+.timer .steps{text-align:left;max-width:420px}
+.timer details{width:100%;max-width:420px}.timer summary{justify-content:center}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:700;z-index:30;max-width:calc(100% - 32px);text-align:center}
+.pop{position:fixed;left:50%;top:40%;pointer-events:none;z-index:40}
+.pop i{position:absolute;width:10px;height:10px;border-radius:3px;background:var(--accent);animation:fly .9s ease-out forwards}
+@keyframes fly{to{transform:translate(var(--x),var(--y)) rotate(200deg);opacity:0}}
+@media (prefers-reduced-motion: reduce){.pop{display:none}.ring .fg{transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="brand">One Small <span>Reset</span></div>
+    <div class="dots" role="group" aria-label="Color theme and settings">
+      <button class="dot" data-a="pal" data-id="sage" style="background:#237565" aria-label="Sage theme"></button>
+      <button class="dot" data-a="pal" data-id="lilac" style="background:#5D4BBD" aria-label="Lilac theme"></button>
+      <button class="dot" data-a="pal" data-id="peach" style="background:#AD4C28" aria-label="Peach theme"></button>
+      <button class="gear" data-a="tab" data-id="settings" aria-label="Settings and backup">⚙</button>
+    </div>
+  </header>
+  <main id="view"></main>
+</div>
+<nav aria-label="Sections"><div>
+  <button data-a="tab" data-id="today">Today</button>
+  <button data-a="tab" data-id="rooms">Rooms</button>
+  <button data-a="tab" data-id="routines">Resets</button>
+  <button data-a="tab" data-id="wins">Wins</button>
+</div></nav>
+<div id="overlay"></div>
+
+<script>
+const DEMO=true;
+const FILEIO=false;  // true only in the downloadable file that is sold
+const SEED={
+ Kitchen:[["Clear one counter",5,1,["Pick the counter nearest the sink","Dishes to the sink, toss the trash","Stop when that one counter is clear"]],["Load or unload the dishwasher",10,2,["Open it and check: clean or dirty?","Do the top rack first","Bottom rack, then close the door"]],["Wipe the stove top",5,1,["Move anything sitting on the stove","Wet a cloth or grab a wipe","Wipe once, back to front. Done"]],["Take out the trash",5,1,["Tie the bag","Walk it out","Put in a new bag"]],["Wipe one fridge shelf",15,3,["Pick ONE shelf and empty it","Toss anything expired","Wipe, put things back, stop there"]],["Sweep the kitchen floor",10,2,["Grab the broom","Sweep toward one corner","Scoop the pile into the trash can"]]],
+ Bathroom:[["Wipe the sink and mirror",5,1,["Clear the sink edge","Wipe the mirror first","Then the sink and faucet"]],["Swap the towels",5,1,["Used towels to the hamper","Hang fresh ones"]],["Scrub the toilet",10,2,["Cleaner in the bowl","Wipe the seat and outside","Brush, flush, done"]],["Clean the shower",15,3,["Take the bottles out","Spray walls and floor","Rinse and put the bottles back"]],["Empty the bathroom trash can",5,1,["Tie the bag","Take it to the main trash","New bag in"]]],
+ Bedroom:[["Make the bed (messy is fine)",5,1,["Pull the sheet up","Pull the comforter up","Pillows on top. That's it"]],["Clothes off the floor into one basket",5,1,["Get one basket","Everything fabric goes in","No sorting right now"]],["Clear the nightstand",5,1,["Cups and trash out","Keep the 3 things you actually use","Wipe it only if you feel like it"]],["Change the sheets",15,3,["Strip the bed","Fitted sheet on, corner by corner","Comforter and pillowcases"]],["Put away one basket of laundry",10,2,["Hanging things first","Then drawers","Basket back in its spot"]]],
+ "Living room":[["Collect cups and plates",5,1,["One lap around the room","Carry everything to the sink"]],["Fold the blankets",5,1,["Shake each one out","Fold in half twice","Stack them in one spot"]],["Clear the coffee table",5,1,["Trash first","Things that live elsewhere go in one pile","Take the pile on your next trip"]],["Vacuum the main path",10,2,["Just the path you walk on","Skip under the furniture today"]],["Dust the shelves",15,3,["One shelf at a time, top first","Lift, wipe, put back","Stop whenever the timer ends"]]],
+ "Home office":[["Clear the desk surface",5,1,["Cups and trash off first","Stack loose papers in one pile","Leave only what you use daily"]],["Toss old papers and wrappers",5,1,["Grab a bag","Anything clearly trash goes in","Stop when the bag is half full"]],["Wipe the keyboard and screen",5,1,["Dry cloth on the screen","Tip the keyboard and shake it out","Quick wipe of the mouse"]],["Sort one paper pile",10,2,["Three piles: keep, act, recycle","Recycle pile goes out now","Act pile gets one spot on the desk"]],["Tidy the cables",15,3,["Unplug what you never use","Bundle the rest with a tie","Tuck them behind the desk"]]],
+ "Kids' room":[["Toys into one bin",5,1,["Get one big bin","Everything on the floor goes in","No sorting today"]],["Books back on the shelf",5,1,["Collect them in one stack","Shelve them any way up"]],["Dirty clothes to the hamper",5,1,["One lap of the room","If in doubt, it is dirty"]],["Clear a walking path",10,2,["Door to bed first","Push things to the edges","Toss whatever is broken"]],["Sort one toy box",15,3,["Tip out ONE box","Broken or outgrown goes in a bag","Everything else back in"]]],
+ "Pet corner":[["Wash the food and water bowls",5,1,["Empty and rinse","Quick scrub with soap","Refill the water"]],["Shake out the pet bed",5,1,["Take it outside or to a window","Shake, then put it back"]],["Scoop the litter box or yard",5,1,["Grab a bag","Scoop what you can see","Bag out to the trash"]],["Sweep up fur and crumbs",10,2,["Just around the bowls and bed","Sweep into one pile","Pile into the trash can"]],["Wash the pet blanket",10,2,["Shake it out first","Into the machine","Set a reminder to hang it"]]],
+ Car:[["Trash out of the car",5,1,["Take one bag to the car","Front seats and door pockets","Bag straight to the trash can"]],["Bring in cups and bottles",5,1,["Collect everything in one trip","Leave them by the sink"]],["Shake out the floor mats",5,1,["Pull out the front mats","Shake or bang them","Back in place"]],["Wipe the dashboard",10,2,["One damp cloth","Dashboard, then the wheel","Door handles if you feel like it"]],["Vacuum the seats",15,3,["Front seats only","Then the footwells","Stop when the timer ends"]]],
+ "Entry & laundry":[["Shoes back on the rack",5,1,["Pair them up","Rack or one neat row"]],["Start one load of laundry",5,1,["Grab whatever is closest to a full load","Detergent in, press start"]],["Move laundry to the dryer",5,1,["Wet clothes into the dryer or onto the rack","Press start"]],["Sort the mail pile",10,2,["Obvious junk straight to recycling","Open the rest","Keep one small to-do pile"]],["Wipe the door handles",5,1,["One damp cloth","Front door first","Then any others you pass"]]]
+};
+const EXTRA=["Home office","Kids' room","Pet corner","Car"];
+const ICON={Kitchen:"pot",Bathroom:"drop",Bedroom:"bed","Living room":"sofa","Entry & laundry":"door","Home office":"desk","Kids' room":"star","Pet corner":"paw",Car:"car"};
+const ICONS={pot:'<path d="M4 10h16v5a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2 10h20M9 6c0-1 1-1 1-2M14 6c0-1 1-1 1-2"/>',drop:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.500 6-11 6-11z"/>',bed:'<path d="M3 18v-7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7M3 15h18M7 9V7h4v2M3 18v2M21 18v2"/>',sofa:'<path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3z"/>',door:'<path d="M6 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17M4 21h16M14.500 12h.01"/>',desk:'<path d="M4 5h16v10H4zM9 19h6M12 15v4"/>',star:'<path d="M12 3l2.600 5.600 6.100.700-4.500 4.200 1.200 6-5.400-3-5.400 3 1.200-6L3.300 9.300l6.100-.7z"/>',paw:'<path d="M12 13c-3 0-5 2.500-5 4.500S9 20 12 20s5-.5 5-2.500S15 13 12 13z"/><circle cx="6.500" cy="10.500" r="1.500"/><circle cx="10" cy="6.500" r="1.500"/><circle cx="14" cy="6.500" r="1.500"/><circle cx="17.500" cy="10.500" r="1.500"/>',car:'<path d="M3 16v-3l2-5a2 2 0 0 1 2-1h10a2 2 0 0 1 2 1l2 5v3z"/><path d="M3 13h18M7 16v2M17 16v2"/>',spark:'<path d="M12 4v5M12 15v5M4 12h5M15 12h5"/>'};
+const ico=k=>`<span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round">${ICONS[k]||ICONS.spark}</svg></span>`;
+const PLANT='<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M26 52h28l-3 20H29z" fill="var(--warm)" stroke="var(--warm-ink)"/><path d="M40 52V30"/><path d="M40 40c-10 0-15-6-15-14 9 0 15 5 15 14z" fill="var(--accent-soft)"/><path d="M40 34c9 0 14-5 14-13-8 0-14 5-14 13z" fill="var(--accent-soft)"/><path d="M62 30v6M59 33h6M16 44v5M13.500 46.500h5M60 10v4M58 12h4"/></svg>';
+const TINY=["Throw away 3 pieces of trash","Put one cup in the sink","Hang up one towel","Put one thing back where it lives","Wipe one small spot","Open a window for fresh air"];
+const RSEED={"Morning reset":["Open the curtains","Make the bed","Dishes to the sink"],"Evening reset":["10-item pickup","Start the dishwasher","Trash to the door"]};
+const V=5;
+const KEY=DEMO?"onesmallreset-demo":"onesmallreset";
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()};
+const shortDate=()=>new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"});
+function fresh(){let n=0;const rn=DEMO?["Kitchen"]:Object.keys(SEED),qn=DEMO?["Morning reset"]:Object.keys(RSEED);
+  const rooms=rn.map(name=>({id:"r"+(++n),name,icon:ICON[name],hidden:EXTRA.includes(name),tasks:SEED[name].map(([nm,min,en,steps])=>({id:"t"+(++n),name:nm,min,en,steps}))}));
+  const routines=qn.map(name=>({id:"q"+(++n),name,steps:RSEED[name].map(s=>({id:"s"+(++n),name:s}))}));
+  return {v:V,n,day:today(),pal:"sage",tab:"today",seen:false,energy:1,time:5,more:false,picks:[],skipped:[],rest:"",done:{},once:[],logged:[],rooms,routines,sound:false,party:true,zones:false,part:{},timer:null,wins:{tasks:0,min:0,days:0},lastWinDay:""}}
+let S=fresh(),EDIT=null,BACKUP=false,ELSE=false,SAVED=true;
+try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);if(o&&o.v===V&&Array.isArray(o.rooms))S=Object.assign(fresh(),o)}}catch(e){}
+function newDay(){if(S.day!==today()){S.day=today();S.done={};S.picks=[];S.skipped=[];S.once=[];S.logged=[];S.part={};S.rest=""}}  // nothing ever carries over as overdue
+newDay();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));SAVED=localStorage.getItem(KEY)!==null}catch(e){SAVED=false}};
+const $=s=>document.querySelector(s), esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const visible=()=>S.rooms.filter(r=>!r.hidden);
+const tiny=()=>TINY.map((n,i)=>({id:"tiny"+i,name:n,min:1,en:0,room:"60 seconds",steps:[]}));
+function find(id){for(const r of S.rooms){const t=r.tasks.find(t=>t.id===id);if(t)return Object.assign({room:r.name,icon:r.icon||"spark"},t)}
+  for(const q of S.routines){const s=q.steps.find(s=>s.id===id);if(s)return {id,name:s.name,min:s.min||2,en:1,room:q.name,steps:[]}}
+  const o=S.once.find(t=>t.id===id);if(o)return {id:o.id,name:o.name,min:5,en:1,room:"Today only",steps:[]};return tiny().find(t=>t.id===id)}
+const zone=()=>{const v=visible();return S.zones&&v.length?v[new Date().getDay()%v.length].name:""};
+function pool(){let p;if(S.energy===0)p=tiny();else{p=[];visible().forEach(r=>r.tasks.forEach(t=>{if(t.en<=S.energy&&t.min<=S.time)p.push(Object.assign({room:r.name},t))}));S.once.forEach(o=>p.push(find(o.id)))}
+  return p.filter(t=>!S.done[t.id])}
+function pick(n){let p=pool().filter(t=>!S.skipped.includes(t.id));if(!p.length){S.skipped=[];p=pool()}
+  const z=zone();p.sort((a,b)=>(b.room==="Today only")-(a.room==="Today only")||(b.room===z)-(a.room===z)||Math.random()-.5);
+  const out=[];let left=S.energy===0?99:S.time;for(const t of p){if(out.length>=n)break;if(t.min<=left){out.push(t.id);left-=t.min}}return out}
+const repick=()=>{S.rest="";S.picks=pick(S.more?3:1)};
+function win(min){S.wins.tasks++;S.wins.min+=min;if(S.lastWinDay!==today()){S.wins.days++;S.lastWinDay=today()}}
+function unwin(min){S.wins.tasks=Math.max(0,S.wins.tasks-1);S.wins.min=Math.max(0,S.wins.min-min)}
+function complete(id){if(S.done[id])return;const t=find(id),m=t?t.min:5;S.done[id]=1;
+  if(S.part[id]!=null){S.wins.min+=Math.max(0,m-S.part[id]);S.logged=S.logged.filter(x=>x!=="Part of: "+t.name);delete S.part[id]}else win(m);  // partial then complete = still one win, minutes never go down
+  S.rooms.forEach(r=>{const x=r.tasks.find(x=>x.id===id);if(x)x.last=shortDate()});
+  const was=S.picks[0]===id;S.picks=S.picks.filter(x=>x!==id);if(was&&!S.picks.length)S.rest="done";save();cheer();render()}
+function cheer(){toast(["Done. That counts.","One less thing.","Nice. Your home felt that.","Small win, real win."][Math.floor(Math.random()*4)]);if(S.party)burst();beep()}
+function toast(m){document.querySelectorAll(".toast").forEach(x=>x.remove());const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=m;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
+function burst(){const p=document.createElement("div");p.className="pop";for(let i=0;i<14;i++){const s=document.createElement("i");const a=Math.random()*6.28,r=70+Math.random()*90;s.style.setProperty("--x",Math.cos(a)*r+"px");s.style.setProperty("--y",Math.sin(a)*r+"px");if(i%3===0)s.style.background="var(--warm)";p.appendChild(s)}document.body.appendChild(p);setTimeout(()=>p.remove(),1000)}
+function beep(){if(!S.sound)return;try{const c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=660;g.gain.setValueAtTime(.15,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.8);o.start();o.stop(c.currentTime+.8)}catch(e){}}
+const stepsHtml=t=>t.steps&&t.steps.length?`<ol class="steps">${t.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>`:"";
+const LOCK=txt=>`<p class="fine">${txt}</p>`;
+function taskRow(t,edit,meta){const on=!!S.done[t.id];return `<div class="task ${on?"done":""}"><button class="check" data-a="done" data-id="${t.id}" aria-label="${on?"Undo":"Log as done"}: ${esc(t.name)}" aria-pressed="${on}">${on?"✓":""}</button><div class="t"><b>${esc(t.name)}</b>${meta===false?"":`<span class="meta">${t.min} min${t.last?" · last done "+esc(t.last):""}</span>`}</div>${edit||""}${edit||on?"":`<button class="btn small ghost" data-a="timer" data-id="${t.id}">Start</button>`}</div>`}
+const sw=(a,on,label)=>`<div class="opt"><span>${label}</span><button class="switch" data-a="${a}" aria-pressed="${on}" aria-label="${label}">${on?"On":"Off"}</button></div>`;
+const VIEWS={
+ today(){const hr=new Date().getHours(),g=hr<12?"Good morning":hr<18?"Good afternoon":"Good evening";const picks=S.picks.map(find).filter(Boolean);const doneN=Object.keys(S.done).length+S.logged.length;
+  let h=`<div class="hero"><div><p class="label">${new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</p><h1>${g}. One small thing is enough.</h1></div>${PLANT}</div>`;
+  if(DEMO)h+=`<section class="card note"><p><b>Free demo: kitchen only.</b> The full app has 9 ready-made rooms, your own rooms and tasks, editable routines and backup.</p><p class="muted">One-time purchase on Etsy. No subscription.</p></section>`;
+  if(!S.seen)h+=`<section class="card note"><p><b>Choose your energy and time. Start one small task. Stop whenever you need.</b></p><p class="muted">No account. Your progress stays in this browser.</p><button class="btn small" data-a="seen">Got it</button></section>`;
+  h+=`<section class="card"><p class="label">My energy right now</p><div class="chips four" role="group" aria-label="Energy">
+   ${[["Very low","60 seconds"],["Low","easy stuff"],["Medium","some energy"],["High","let's go"]].map((e,i)=>`<button class="chip" data-a="en" data-id="${i}" aria-pressed="${S.energy===i}"><b>${e[0]}</b><small>${e[1]}</small></button>`).join("")}</div>
+   ${S.energy===0?"":`<p class="label">Time I have</p><div class="chips" role="group" aria-label="Time">${[5,15,30].map(t=>`<button class="chip" data-a="tm" data-id="${t}" aria-pressed="${S.time===t}"><b>${t} min</b></button>`).join("")}</div>`}</section>`;
+  if(S.rest==="enough")h+=`<section class="card focus"><h2>That's enough for today.</h2><p class="muted">${doneN?`You did ${doneN} ${doneN===1?"thing":"things"}. It counts, and it stays counted.`:"Rest counts too. Nothing here will be waiting as overdue tomorrow."}</p><button class="btn ghost" data-a="another">Choose another task</button></section>`;
+  else if(picks.length){const t=picks[0];h+=`<section class="card focus"><div class="roomhead"><div class="rh">${t.icon?ico(t.icon):""}<span class="label">One small task</span></div><span class="pill">${t.en===0?esc(t.room):esc(t.room)+" · "+t.min+" min"}</span></div><p class="big">${esc(t.name)}</p>${stepsHtml(t)}<button class="btn" data-a="timer" data-id="${t.id}">Start</button><div class="row"><button class="btn small ghost" data-a="swap">Try another task</button><button class="btn small ghost" data-a="done" data-id="${t.id}">Log as done</button></div><button class="btn text" data-a="enough">That's enough for today</button></section>`;
+   if(picks.length>1)h+=`<section class="card"><span class="label">If you still feel like it</span>${picks.slice(1).map(t=>taskRow(t)).join("")}</section>`}
+  else if(S.rest==="done")h+=`<section class="card focus"><h2>Done. That counts.</h2><p class="muted">You can stop here, or take one more small one.</p><div class="col2"><button class="btn" data-a="another">Choose another task</button><button class="btn ghost" data-a="enough">That's enough for today</button></div></section>`;
+  else h+=`<section class="card focus"><h2>Nothing else suggested.</h2><p class="muted">Stop here or choose a room. You can also change your energy or time above.</p><div class="col2"><button class="btn ghost" data-a="tab" data-id="rooms">Choose a room</button><button class="btn ghost" data-a="enough">That's enough for today</button></div></section>`;
+  h+=`<section class="card"><div class="roomhead"><h2>Something else?</h2><button class="btn small ghost" data-a="else" aria-expanded="${ELSE}">${ELSE?"Close":"Open"}</button></div>${ELSE?`
+   ${DEMO?"":`<p class="label">Add a one-time task</p><form class="add" data-f="once"><input type="text" name="name" aria-label="One-time task for today" placeholder="e.g. Clean up the spilled coffee" maxlength="60"><button class="btn small">Add</button></form><p class="muted">For today only. Unfinished tasks won't carry over.</p>${S.once.map(o=>taskRow(find(o.id),"",false)).join("")}`}
+   <p class="label">Log something you already cleaned</p><form class="add" data-f="log"><input type="text" name="name" aria-label="Something you already did" placeholder="e.g. Did the dishes" maxlength="60"><button class="btn small">Count it</button></form>`:""}
+   ${S.logged.map(n=>`<div class="task done"><span class="check on" aria-hidden="true">✓</span><div class="t"><b>${esc(n)}</b></div></div>`).join("")}</section>`;
+  return h},
+ rooms(){const hid=S.rooms.filter(r=>r.hidden);return `<div><h1>Rooms</h1><p class="muted">Ready to use as they are. You never have to finish a room: pick any task, any day.</p></div>`+visible().map(r=>{const d=r.tasks.filter(t=>S.done[t.id]).length,ed=EDIT===r.id;
+  return `<section class="card"><div class="roomhead"><div class="rh">${ico(r.icon)}<h2>${esc(r.name)}</h2></div>${d?`<span class="muted">${d} done here today</span>`:""}${DEMO?"":`<button class="btn small ghost" data-a="edit" data-id="${r.id}">${ed?"Finish editing":"Edit"}</button>`}</div>
+   ${ed?`<form class="add" data-f="rename" data-id="${r.id}"><input type="text" name="name" aria-label="Room name" value="${esc(r.name)}" maxlength="30"><button class="btn small">Rename</button></form><button class="btn small ghost" data-a="hide" data-id="${r.id}">Hide this room</button>`:""}
+   ${r.tasks.map(t=>taskRow(t,ed?`<button class="btn small ghost" data-a="deltask" data-id="${t.id}">Remove</button>`:"")).join("")}
+   ${DEMO?"":`<form class="stack" data-f="task" data-id="${r.id}"><input type="text" name="name" aria-label="Add a task to ${esc(r.name)}" placeholder="Add your own task" maxlength="60">
+    <details><summary>Optional: minutes, energy, small steps</summary><div class="grid"><label>Minutes<select name="min"><option>1</option><option selected>5</option><option>10</option><option>15</option><option>30</option></select></label><label>Energy needed<select name="en"><option value="1" selected>Low</option><option value="2">Medium</option><option value="3">High</option></select></label></div><textarea name="steps" aria-label="Small steps, one per line" placeholder="Small steps, one per line (optional)"></textarea></details>
+    <div class="row"><button class="btn small ghost" name="go" value="">Add</button><button class="btn small" name="go" value="now">Add and do this now</button></div></form>`}</section>`}).join("")
+  +(DEMO?LOCK("More rooms and editing are in the full version."):`<section class="card"><h2>Add a room</h2><form class="add" data-f="room"><input type="text" name="name" aria-label="New room name" placeholder="e.g. Home office" maxlength="30"><button class="btn small">Add</button></form>${hid.length?`<p class="label">More rooms, ready to use</p><p class="muted">Switched off so your list stays short. Tap Show to add one.</p>`+hid.map(r=>`<div class="opt"><span>${esc(r.name)}</span><button class="btn small ghost" data-a="show" data-id="${r.id}">Show</button></div>`).join(""):""}</section>`)},
+ routines(){return `<div><h1>Daily resets</h1><p class="muted">A few tiny steps. Skip any step, any day.</p></div>`+S.routines.map(q=>{const ed=EDIT===q.id;return `<section class="card"><div class="roomhead"><h2>${esc(q.name)}</h2>${DEMO?"":`<button class="btn small ghost" data-a="edit" data-id="${q.id}">${ed?"Finish editing":"Edit"}</button>`}</div>
+   ${ed?`<form class="add" data-f="qrename" data-id="${q.id}"><input type="text" name="name" aria-label="Routine name" value="${esc(q.name)}" maxlength="30"><button class="btn small">Rename</button></form>`:""}
+   ${q.steps.map((s,i)=>taskRow(find(s.id),ed?`${i?`<button class="btn small ghost" data-a="up" data-id="${s.id}" aria-label="Move up: ${esc(s.name)}">↑</button>`:""}<select class="mins" data-step="${s.id}" aria-label="Minutes for ${esc(s.name)}">${[1,2,5,10].map(m=>`<option${(s.min||2)===m?" selected":""}>${m}</option>`).join("")}</select><button class="btn small ghost" data-a="delstep" data-id="${s.id}">Remove</button>`:"")).join("")}
+   ${ed?`<form class="add" data-f="step" data-id="${q.id}"><input type="text" name="name" aria-label="Add a step" placeholder="Add a step" maxlength="60"><button class="btn small">Add</button></form>`:""}</section>`}).join("")
+  +(DEMO?LOCK("The evening reset and routine editing are in the full version."):"")},
+ wins(){const d=Object.keys(S.done).length+S.logged.length;return `<div><h1>Your wins</h1><p class="muted">This page only counts what you did. There is no list of what you didn't.</p></div>
+  <section class="card"><div class="wins"><div class="win"><b>${d}</b><span>done today</span></div><div class="win"><b>${S.wins.tasks}</b><span>total wins</span></div><div class="win"><b>${S.wins.min}</b><span>estimated minutes completed</span></div></div>
+  <p>${S.wins.days?`You have shown up on <b>${S.wins.days}</b> ${S.wins.days===1?"day":"different days"}. Gaps between them don't erase anything.`:"Your first win is one tiny task away."}</p><p class="muted">Minutes are each task's estimate, not a stopwatch. Partial progress counts as a win and adds only the minutes you timed.</p></section>`},
+ settings(){return `<div><h1>Settings</h1></div>
+  <section class="card">${sw("more",S.more,"Suggest up to 3 tasks instead of 1")}${sw("party",S.party,"Confetti when I finish")}${sw("sound",S.sound,"Soft sound when I finish")}${sw("zones",S.zones,"Prefer one room each day (only a suggestion)")}</section>
+  ${DEMO?LOCK("Backup and restore are in the full version."):`<section class="card"><h2>Backup</h2><p class="muted">Everything is saved on this browser only. There is no account and no automatic sync. Clearing your browser data can erase your progress, and the online link and the downloaded file save separately. Keep a backup to stay safe or to move to another device.</p>
+   ${FILEIO?`<div class="row"><button class="btn small" data-a="dl">Download backup file</button><button class="btn small ghost" data-a="ul">Import backup file</button></div><input type="file" id="bkfile" accept=".json,application/json" hidden>`:""}
+   <button class="btn small ghost" data-a="backup">${BACKUP?"Hide backup code":"Show my backup code"}</button>
+   ${BACKUP?`<textarea class="code" id="bk" readonly aria-label="Your backup code">${esc(JSON.stringify(S))}</textarea><button class="btn small" data-a="copy">Copy backup code</button>`:""}
+   <form class="stack" data-f="restore"><textarea class="code" name="name" aria-label="Paste a backup code to restore" placeholder="Paste a backup code here to restore it"></textarea><button class="btn small ghost">Restore from backup</button></form></section>`}
+  <section class="card"><h2>Start over</h2><p class="muted">Erases everything saved on this browser${DEMO?"":", including your own rooms and tasks"}.</p><button class="btn ghost small" data-a="reset">Erase my data</button></section>`}
+};
+function render(){document.documentElement.dataset.pal=S.pal;document.querySelectorAll(".dot").forEach(b=>b.setAttribute("aria-pressed",b.dataset.id===S.pal));
+  document.querySelectorAll("[data-a=tab]").forEach(b=>b.dataset.id===S.tab?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
+  $("#view").innerHTML=VIEWS[S.tab]()+(SAVED?`<p class="fine">Saved on this browser · no account, no automatic sync</p>`:`<p class="fine" role="alert" style="color:var(--warm-ink);background:var(--warm);border-radius:12px;padding:10px"><b>Your latest changes couldn't be saved.</b> ${DEMO?"Browser storage may be blocked or full.":"Make a backup before leaving. Browser storage may be blocked or full."}</p>${DEMO||S.tab==="settings"?"":`<button class="btn small" data-a="tab" data-id="settings">Open backup</button>`}`)}
+let tick=null;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){const b=document.querySelector("#t-close");if(b)b.click()}});
+function timer(id,resume){const t=find(id);if(!t){S.timer=null;return}const C=2*Math.PI*52,ov=$("#overlay");
+  const T=resume&&S.timer&&S.timer.id===id?S.timer:{id,total:t.min*60,left:t.min*60,run:true,end:Date.now()+t.min*60000,rang:0};S.timer=T;save();  // saved so it survives refresh and screen lock
+  const left=()=>T.run?Math.max(0,Math.round((T.end-Date.now())/1000)):T.left;
+  ov.innerHTML=`<div class="timer" role="dialog" aria-label="Timer"><p class="label">${esc(t.room)}</p><h2 style="font-size:26px">${esc(t.name)}</h2><div class="ring"><svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="52"/><circle class="fg" cx="60" cy="60" r="52" stroke-dasharray="${C}"/></svg><div class="num"></div></div>${stepsHtml(t)}<p class="muted" id="t-msg"></p><div class="row" style="width:100%;max-width:420px"><button class="btn" id="t-done">Done</button><button class="btn ghost" id="t-pause">Pause</button></div><details><summary>More options</summary><div class="row"><button class="btn small ghost" id="t-more">+2 min</button><button class="btn small ghost" id="t-part">Save partial progress</button><button class="btn small ghost" id="t-close">Leave task</button></div></details></div>`;
+  const draw=()=>{const l=left();ov.querySelector(".num").textContent=String(Math.floor(l/60)).padStart(2,"0")+":"+String(l%60).padStart(2,"0");ov.querySelector(".fg").setAttribute("stroke-dashoffset",C*(1-l/T.total));ov.querySelector("#t-msg").textContent=l?"Only this. Everything else can wait.":"Timer finished. Stop here or keep going.";ov.querySelector("#t-pause").textContent=l===0?"Continue timer (+2 min)":T.run?"Pause":"Resume"};
+  const stop=()=>{clearInterval(tick);tick=null;S.timer=null;save();ov.innerHTML=""};
+  draw();ov.querySelector("#t-done").focus();clearInterval(tick);tick=setInterval(()=>{if(T.run){draw();if(left()===0&&!T.rang){T.rang=1;save();beep()}}},500);
+  ov.onclick=e=>{const b=e.target.closest("button");if(!b)return;const l=left();
+   if(b.id==="t-done"){stop();complete(id)}
+   else if(b.id==="t-pause"){if(l===0){T.total+=120;T.end=Date.now()+120000;T.run=true;T.rang=0}else if(T.run){T.left=l;T.run=false}else{T.end=Date.now()+T.left*1000;T.run=true}save();draw()}
+   else if(b.id==="t-more"){T.total+=120;T.rang=0;if(T.run)T.end=Math.max(T.end,Date.now())+120000;else T.left+=120;save();draw()}
+   else if(b.id==="t-part"){const m=Math.max(1,Math.round((T.total-l)/60));stop();if(S.part[id]!=null){S.part[id]+=m;S.wins.min+=m}else{S.part[id]=m;win(m);S.logged.push("Part of: "+t.name)}save();toast("Partial progress saved. It counts.");render()}
+   else if(b.id==="t-close")stop()}}
+document.addEventListener("click",e=>{const b=e.target.closest("button[data-a]");if(!b||b.closest("#overlay"))return;const a=b.dataset.a,id=b.dataset.id;newDay();
+  if(a==="pal")S.pal=id;else if(a==="tab"){S.tab=id;EDIT=null;window.scrollTo(0,0)}
+  else if(a==="seen")S.seen=true
+  else if(a==="en"){S.energy=+id;S.skipped=[];repick()}else if(a==="tm"){S.time=+id;S.skipped=[];repick()}
+  else if(a==="another")repick()
+  else if(a==="swap"){S.skipped.push(S.picks[0]);repick()}
+  else if(a==="more"){S.more=!S.more;if(S.rest!=="enough")repick()}
+  else if(a==="enough"){S.rest="enough";S.picks=[]}
+  else if(a==="else")ELSE=!ELSE
+  else if(a==="done"){if(S.done[id]){const t=find(id);delete S.done[id];unwin(t?t.min:5)}else{complete(id);return}}
+  else if(a==="timer"){timer(id);return}
+  else if(a==="party")S.party=!S.party;else if(a==="sound"){S.sound=!S.sound;beep()}else if(a==="zones")S.zones=!S.zones
+  else if(a==="edit")EDIT=EDIT===id?null:id
+  else if(a==="hide"){S.rooms.find(r=>r.id===id).hidden=true;EDIT=null;S.picks=[];repick()}else if(a==="show")S.rooms.find(r=>r.id===id).hidden=false
+  else if(a==="deltask"){S.rooms.forEach(r=>r.tasks=r.tasks.filter(t=>t.id!==id));S.picks=S.picks.filter(x=>x!==id)}
+  else if(a==="delstep")S.routines.forEach(q=>q.steps=q.steps.filter(s=>s.id!==id))
+  else if(a==="up")S.routines.forEach(q=>{const i=q.steps.findIndex(s=>s.id===id);if(i>0)q.steps.splice(i-1,0,q.steps.splice(i,1)[0])})
+  else if(a==="backup")BACKUP=!BACKUP
+  else if(a==="dl"){const l=document.createElement("a");l.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:"application/json"}));l["download"]="one-small-reset-backup.json";document.body.appendChild(l);l.click();l.remove();toast("Backup file downloaded.");return}
+  else if(a==="ul"){$("#bkfile").click();return}
+  else if(a==="copy"){const el=$("#bk");el.select();try{navigator.clipboard.writeText(el.value).then(()=>toast("Copied. Paste it somewhere safe."),()=>toast("Text selected. Copy it now."))}catch(x){toast("Text selected. Copy it now.")}return}
+  else if(a==="reset"){if(b.dataset.sure){S=fresh();repick();toast("Erased. Fresh start.")}else{b.dataset.sure=1;b.textContent="Tap again to erase everything";return}}
+  else return;save();render()});
+document.addEventListener("change",e=>{const el=e.target;if(el.dataset&&el.dataset.step){S.routines.forEach(q=>q.steps.forEach(s=>{if(s.id===el.dataset.step)s.min=+el.value}));save()}
+  else if(el.id==="bkfile"&&el.files[0]){el.files[0].text().then(t=>{$("form[data-f=restore] textarea").value=t;toast("Backup loaded. Tap Restore to finish.")})}});
+document.addEventListener("submit",e=>{const f=e.target.closest("form[data-f]");if(!f)return;e.preventDefault();const v=f.elements.name.value.trim();if(!v)return;const k=f.dataset.f,id=f.dataset.id;let now=null;
+  if(k==="once"){S.once.push({id:"o"+(++S.n),name:v});if(!S.picks.length&&S.rest!=="enough")repick()}
+  else if(k==="log"){S.logged.push(v);win(5);cheer()}
+  else if(k==="task"){const t={id:"t"+(++S.n),name:v,min:+f.elements.min.value||5,en:+f.elements.en.value||1,steps:f.elements.steps.value.split("\n").map(s=>s.trim()).filter(Boolean).slice(0,6)};S.rooms.find(r=>r.id===id).tasks.push(t);if(e.submitter&&e.submitter.value==="now")now=t.id}
+  else if(k==="rename")S.rooms.find(r=>r.id===id).name=v;
+  else if(k==="qrename")S.routines.find(q=>q.id===id).name=v;
+  else if(k==="step")S.routines.find(q=>q.id===id).steps.push({id:"s"+(++S.n),name:v});
+  else if(k==="room")S.rooms.push({id:"r"+(++S.n),name:v,hidden:false,tasks:[]});
+  else if(k==="restore"){let o;try{o=JSON.parse(v);if(!o||o.v!==V||!Array.isArray(o.rooms))throw 0}catch(x){toast("That doesn't look like a backup code.");return}
+   if(!f.dataset.sure){f.dataset.sure=1;f.querySelector("button").textContent="Tap again: this replaces everything here";return}
+   S=Object.assign(fresh(),o);newDay();toast("Backup restored.")}
+  save();render();if(now)timer(now)});
+save();if(!S.picks.length&&!S.rest)repick();  // open straight onto one task that matches the visible choices
+render();if(S.timer)timer(S.timer.id,true);
+</script>
+</body>
+</html>
