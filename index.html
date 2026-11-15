@@ -51,6 +51,7 @@ p{margin:0}.muted{color:var(--muted)}.fine{font-size:13px;color:var(--muted);tex
 .chip small{color:var(--muted);font-size:11px}
 .chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
 .btn{min-height:54px;border-radius:16px;border:0;background:var(--accent);color:var(--accent-ink);font:700 17px var(--body);cursor:pointer;padding:0 20px}
+a.btn{display:flex;align-items:center;justify-content:center;text-decoration:none}
 .btn.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent)}
 .btn.small{min-height:42px;font-size:14px;border-radius:12px;padding:0 14px}
 .btn.text{background:transparent;color:var(--muted);min-height:40px;font-size:14px;text-decoration:underline;padding:0 6px;border:0}
@@ -97,6 +98,7 @@ nav button[aria-current="page"]{background:var(--accent-soft);color:var(--accent
 .pop{position:fixed;left:50%;top:40%;pointer-events:none;z-index:40}
 .pop i{position:absolute;width:10px;height:10px;border-radius:3px;background:var(--accent);animation:fly .9s ease-out forwards}
 @keyframes fly{to{transform:translate(var(--x),var(--y)) rotate(200deg);opacity:0}}
+.badge body{padding-bottom:176px}.badge nav{padding-bottom:calc(66px + env(safe-area-inset-bottom,0px))}.badge .toast{bottom:164px}
 @media (prefers-reduced-motion: reduce){.pop{display:none}.ring .fg{transition:none}html{scroll-behavior:auto}}
 </style>
 </head>
@@ -124,6 +126,8 @@ nav button[aria-current="page"]{background:var(--accent-soft);color:var(--accent
 
 <script>
 const DEMO=true;
+const BADGE=false;  // true only on the host that adds its own corner badge
+if(BADGE)document.documentElement.classList.add("badge");
 const FILEIO=false;  // true only in the downloadable file that is sold
 const SEED={
  Kitchen:[["Clear one counter",5,1,["Pick the counter nearest the sink","Dishes to the sink, toss the trash","Stop when that one counter is clear"]],["Load or unload the dishwasher",10,2,["Open it and check: clean or dirty?","Do the top rack first","Bottom rack, then close the door"]],["Wipe the stove top",5,1,["Move anything sitting on the stove","Wet a cloth or grab a wipe","Wipe once, back to front. Done"]],["Take out the trash",5,1,["Tie the bag","Walk it out","Put in a new bag"]],["Wipe one fridge shelf",15,3,["Pick ONE shelf and empty it","Toss anything expired","Wipe, put things back, stop there"]],["Sweep the kitchen floor",10,2,["Grab the broom","Sweep toward one corner","Scoop the pile into the trash can"]]],
@@ -186,7 +190,7 @@ const sw=(a,on,label)=>`<div class="opt"><span>${label}</span><button class="swi
 const VIEWS={
  today(){const hr=new Date().getHours(),g=hr<12?"Good morning":hr<18?"Good afternoon":"Good evening";const picks=S.picks.map(find).filter(Boolean);const doneN=Object.keys(S.done).length+S.logged.length;
   let h=`<div class="hero"><div><p class="label">${new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"})}</p><h1>${g}. One small thing is enough.</h1></div>${PLANT}</div>`;
-  if(DEMO)h+=`<section class="card note"><p><b>Free demo: kitchen only.</b> The full app has 9 ready-made rooms, your own rooms and tasks, editable routines and backup.</p><p class="muted">One-time purchase on Etsy. No subscription.</p></section>`;
+  if(DEMO)h+=`<section class="card note"><p><b>Free demo: kitchen only.</b> The full app has 9 ready-made rooms, your own rooms and tasks, editable routines and backup.</p><p class="muted">One-time purchase on Etsy. No subscription.</p><a class="btn small" href="https://www.etsy.com/listing/4617719444" target="_blank" rel="noopener">Get the full app on Etsy</a></section>`;
   if(!S.seen)h+=`<section class="card note"><p><b>Choose your energy and time. Start one small task. Stop whenever you need.</b></p><p class="muted">No account. Your progress stays in this browser.</p><button class="btn small" data-a="seen">Got it</button></section>`;
   h+=`<section class="card"><p class="label">My energy right now</p><div class="chips four" role="group" aria-label="Energy">
    ${[["Very low","60 seconds"],["Low","easy stuff"],["Medium","some energy"],["High","let's go"]].map((e,i)=>`<button class="chip" data-a="en" data-id="${i}" aria-pressed="${S.energy===i}"><b>${e[0]}</b><small>${e[1]}</small></button>`).join("")}</div>
